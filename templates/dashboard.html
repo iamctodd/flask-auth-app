@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Auth App{% endblock %}
+
+{% block content %}
+<div class="row mt-5 mb-5">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-body p-5">
+                <h2 class="card-title mb-4">Welcome, {{ session.username }}! 👋</h2>
+                
+                <div class="alert alert-info">
+                    <strong>ℹ️ You're logged in!</strong> This is your dashboard. Only authenticated users can see this page.
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">📊 Account Status</h5>
+                                <p class="card-text">
+                                    <strong>Status:</strong> Active ✅<br>
+                                    <strong>Auth Method:</strong> Standard Login<br>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">🔒 Security</h5>
+                                <p class="card-text">
+                                    <strong>Password:</strong> Set ✅<br>
+                                    <strong>Session:</strong> Active<br>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h4 class="mt-4 mb-3">Quick Actions</h4>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('profile') }}" class="btn btn-primary">View Profile</a>
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">Logout</a>
+                </div>
+                
+                <hr class="my-4">
+                
+                <h4 class="mb-3">Next Steps</h4>
+                <ul class="list-group">
+                    <li class="list-group-item">✅ Standard login/registration working</li>
+                    <li class="list-group-item">⏳ Add Google OAuth (step-by-step guide coming)</li>
+                    <li class="list-group-item">⏳ Add Microsoft OAuth</li>
+                    <li class="list-group-item">⏳ Add GitHub OAuth</li>
+                    <li class="list-group-item">⏳ Add account linking (connect multiple auth methods)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

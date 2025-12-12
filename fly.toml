@@ -1,0 +1,29 @@
+app = "flask-auth-app"
+primary_region = "sjc"
+
+[build]
+  builder = "pacer"
+
+[env]
+  PORT = "8080"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 8080
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+[checks]
+  [checks.alive]
+    type = "http"
+    uri = "/"
+    interval = "10s"
+    timeout = "5s"
