@@ -186,22 +186,6 @@ def oauth_google():
     google_provider_cfg = get_google_provider_cfg()
     authorization_endpoint = google_provider_cfg["authorization_endpoint"]
     
-    request_uri = authorization_endpoint + "?" + urlencode({
-        "client_id": GOOGLE_CLIENT_ID,
-        "redirect_uri": url_for("oauth_google_callback", _external=True, _scheme='https'),
-        "scope": "openid email profile",
-        "response_type": "code",
-        "access_type": "offline",
-    })
-    return redirect(request_uri)
-
-
-@app.route('/oauth/google')
-def oauth_google():
-    """Redirect to Google OAuth consent page"""
-    google_provider_cfg = get_google_provider_cfg()
-    authorization_endpoint = google_provider_cfg["authorization_endpoint"]
-    
     redirect_uri = url_for("oauth_google_callback", _external=True, _scheme='https')
     print(f"DEBUG: Redirect URI = {redirect_uri}")
     
