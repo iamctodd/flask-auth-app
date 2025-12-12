@@ -1,29 +1,32 @@
-app = "flask-auth-app"
-primary_region = "sjc"
+# fly.toml app configuration file generated for flask-auth-app on 2025-12-12T11:17:00-05:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'flask-auth-app'
+primary_region = 'sjc'
 
 [build]
-  builder = "pacer"
+  builder = 'heroku'
 
 [env]
-  PORT = "8080"
+  PORT = '8080'
 
 [[services]]
-  protocol = "tcp"
+  protocol = 'tcp'
   internal_port = 8080
-  processes = ["app"]
+  processes = ['app']
 
   [[services.ports]]
     port = 80
-    handlers = ["http"]
+    handlers = ['http']
     force_https = true
 
   [[services.ports]]
     port = 443
-    handlers = ["tls", "http"]
+    handlers = ['tls', 'http']
 
-[checks]
-  [checks.alive]
-    type = "http"
-    uri = "/"
-    interval = "10s"
-    timeout = "5s"
+[[vm]]
+  memory = '1gb'
+  cpus = 1
+  memory_mb = 1024

@@ -16,7 +16,11 @@ load_dotenv()
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'your-secret-key-change-this')
 # Use PostgreSQL in production, SQLite in development
-database_url = os.getenv('DATABASE_URL', 'sqlite:///auth.db')
+database_url = os.getenv('DATABASE_URL')
+if not database_url:
+    database_url = 'sqlite:///auth.db'
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 
 # Fix PostgreSQL URL format if needed
 if database_url.startswith('postgres://'):
@@ -184,7 +188,7 @@ def oauth_google():
     
     request_uri = authorization_endpoint + "?" + urlencode({
         "client_id": GOOGLE_CLIENT_ID,
-        "redirect_uri": url_for("oauth_google_callback", _external=True),
+        "redirect_uri": url_for("oauth_google_callback", _external=True, _scheme='https'),
         "scope": "openid email profile",
         "response_type": "code",
         "access_type": "offline",
@@ -211,7 +215,7 @@ def oauth_google_callback():
             "client_secret": GOOGLE_CLIENT_SECRET,
             "code": code,
             "grant_type": "authorization_code",
-            "redirect_uri": url_for("oauth_google_callback", _external=True),
+            "redirect_uri": url_for("oauth_google_callback", _external=True, _scheme='https'),
         }
         
         token_response = requests.post(token_endpoint, data=token_payload)
