@@ -197,6 +197,94 @@ def oauth_google():
     })
     return redirect(request_uri)
 
+@app.route('/oauth/google/callback')
+def oauth_google_callback():
+    """Handle Google OAuth callback"""
+    code = request.args.get("code")
+    
+    if not code:
+        flash('Google authentication failed', 'danger')
+        return redirect(url_for('login'))
+    
+    try:
+        # Get token from Google
+        google_provider_cfg = get_google_provider_cfg()
+        token_endpoint = google_provider_cfg["token_endpoint"]
+        
+        token_payload = {
+            "client_id": GOOGLE_CLIENT_ID,
+            "client_secret": GOOGLE_CLIENT_SECRET,
+            "code": code,
+            "grant_type": "authorization_code",
+            "redirect_uri": url_for("oauth_google_callback", _external=True, _scheme='https'),
+        }
+        
+        token_response = requests.post(token_endpoint, data=token_payload)
+        tokens = token_response.json()
+        
+        if "error" in tokens:
+            flash('Failed to get token from Google', 'danger')
+            return redirect(url_for('login'))
+        
+        # Get user info
+        userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
+        userinfo_response = requests.get(
+            userinfo_endpoint,
+            headers={"Authorization": f"Bearer {tokens['access_token']}"})
+        
+        user_info = userinfo_response.json()
+        
+        if not user_info.get('email'):
+            flash('Failed to get user info from Google', 'danger')
+            return redirect(url_for('login'))
+        
+        email = user_info.get('email')
+        google_id = user_info.get('sub')
+        username = email.split('@')[0]
+        
+        # Check if user exists by google_id
+        user = User.query.filter_by(google_id=google_id).first()
+        
+        if user:
+            # User exists, log them in
+            session['user_id'] = user.id
+            session['username'] = user.username
+            session['email'] = user.email
+            flash(f'Welcome back, {user.username}!', 'success')
+            return redirect(url_for('dashboard'))
+        
+        # Check if email already registered
+        user = User.query.filter_by(email=email).first()
+        
+        if user:
+            flash('This email is already registered. Please log in with your regular account first.', 'warning')
+            return redirect(url_for('login'))
+        
+        # Create new user
+        user = User(
+            username=username,
+            email=email,
+            google_id=google_id
+        )
+        
+        try:
+            db.session.add(user)
+            db.session.commit()
+            
+            session['user_id'] = user.id
+            session['username'] = user.username
+            session['email'] = user.email
+            flash(f'Account created with Google! Welcome, {user.username}!', 'success')
+            return redirect(url_for('dashboard'))
+        except Exception as e:
+            db.session.rollback()
+            flash('Error creating account', 'danger')
+            return redirect(url_for('login'))
+    
+    except Exception as e:
+        flash('Google authentication failed', 'danger')
+        return redirect(url_for('login'))
+
 # ==================== ERROR HANDLERS ====================
 
 @app.errorhandler(404)
