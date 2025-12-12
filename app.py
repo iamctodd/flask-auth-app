@@ -187,7 +187,6 @@ def oauth_google():
     authorization_endpoint = google_provider_cfg["authorization_endpoint"]
     
     redirect_uri = url_for("oauth_google_callback", _external=True, _scheme='https')
-    print(f"DEBUG: Redirect URI = {redirect_uri}")
     
     request_uri = authorization_endpoint + "?" + urlencode({
         "client_id": GOOGLE_CLIENT_ID,
@@ -196,7 +195,6 @@ def oauth_google():
         "response_type": "code",
         "access_type": "offline",
     })
-    print(f"DEBUG: Full request URI = {request_uri}")
     return redirect(request_uri)
 
 # ==================== ERROR HANDLERS ====================
