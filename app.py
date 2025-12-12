@@ -186,7 +186,8 @@ def oauth_google():
     google_provider_cfg = get_google_provider_cfg()
     authorization_endpoint = google_provider_cfg["authorization_endpoint"]
     
-    redirect_uri = url_for("oauth_google_callback", _external=True, _scheme='https')
+    # Build the redirect URI manually for Fly.io
+    redirect_uri = "https://flask-auth-app.fly.dev/oauth/google/callback"
     
     request_uri = authorization_endpoint + "?" + urlencode({
         "client_id": GOOGLE_CLIENT_ID,
@@ -216,7 +217,7 @@ def oauth_google_callback():
             "client_secret": GOOGLE_CLIENT_SECRET,
             "code": code,
             "grant_type": "authorization_code",
-            "redirect_uri": url_for("oauth_google_callback", _external=True, _scheme='https'),
+            "redirect_uri": "https://flask-auth-app.fly.dev/oauth/google/callback",
         }
         
         token_response = requests.post(token_endpoint, data=token_payload)
